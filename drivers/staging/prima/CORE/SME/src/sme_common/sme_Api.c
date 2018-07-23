@@ -15092,3 +15092,88 @@ eHalStatus sme_get_tsf_req(tHalHandle hHal, tSirCapTsfParams cap_tsf_params)
     }
     return(status);
 }
+<<<<<<< HEAD
+=======
+
+VOS_STATUS sme_roam_csa_ie_request(tHalHandle hal, tCsrBssid bssid,
+                                   uint8_t new_chan, uint32_t phy_mode,
+                                   uint8_t sme_session_id)
+{
+   VOS_STATUS status = VOS_STATUS_E_FAILURE;
+   tpAniSirGlobal mac_ctx = PMAC_STRUCT(hal);
+   uint8_t cb_mode = 0;
+   tCsrRoamSession *session;
+
+   session = CSR_GET_SESSION(mac_ctx, sme_session_id);
+
+   if (!session) {
+       smsLog(mac_ctx, LOGE, FL("session %d not found"), sme_session_id);
+       return VOS_STATUS_E_FAILURE;
+   }
+
+   status = sme_AcquireGlobalLock(&mac_ctx->sme);
+   if (VOS_IS_STATUS_SUCCESS(status)) {
+       if (CSR_IS_CHANNEL_5GHZ(new_chan)) {
+           sme_SelectCBMode(hal, phy_mode, new_chan,
+                            eHT_MAX_CHANNEL_WIDTH);
+           cb_mode = mac_ctx->roam.configParam.channelBondingMode5GHz;
+       }
+       status = csr_roam_send_chan_sw_ie_request(mac_ctx, bssid,
+                                                 new_chan, cb_mode);
+       sme_ReleaseGlobalLock(&mac_ctx->sme);
+   }
+   return status;
+}
+
+
+VOS_STATUS sme_roam_channel_change_req(tHalHandle hal, tCsrBssid bssid,
+                                   uint8_t new_chan, tCsrRoamProfile *profile,
+                                   uint8_t sme_session_id)
+{
+   VOS_STATUS status;
+   tpAniSirGlobal mac_ctx = PMAC_STRUCT(hal);
+   uint8_t cb_mode = 0;
+   tCsrRoamSession *session;
+
+   session = CSR_GET_SESSION(mac_ctx, sme_session_id);
+
+   if (!session) {
+       smsLog(mac_ctx, LOGE, FL("session %d not found"), sme_session_id);
+       return VOS_STATUS_E_FAILURE;
+   }
+
+   status = sme_AcquireGlobalLock(&mac_ctx->sme);
+   if (VOS_IS_STATUS_SUCCESS(status)) {
+       if (CSR_IS_CHANNEL_5GHZ(new_chan)) {
+           sme_SelectCBMode(hal, profile->phyMode, new_chan,
+                            eHT_MAX_CHANNEL_WIDTH);
+           cb_mode = mac_ctx->roam.configParam.channelBondingMode5GHz;
+       }
+       status = csr_roam_channel_change_req(mac_ctx, bssid, new_chan, cb_mode,
+                                            profile);
+       sme_ReleaseGlobalLock(&mac_ctx->sme);
+   }
+   return status;
+}
+
+v_TIME_t
+sme_get_connect_strt_time(tHalHandle hal, uint8_t session_id)
+{
+   tpAniSirGlobal mac_ctx = PMAC_STRUCT(hal);
+   tCsrRoamSession *session;
+
+   if (!CSR_IS_SESSION_VALID(mac_ctx, session_id)) {
+       smsLog(mac_ctx, LOGE, FL("session id %d not valid"), session_id);
+       return vos_timer_get_system_time();
+   }
+   session = CSR_GET_SESSION(mac_ctx, session_id);
+   return session->connect_req_start_time;
+}
+
+void sme_request_imps(tHalHandle hal)
+{
+   tpAniSirGlobal mac_ctx = PMAC_STRUCT(hal);
+
+   csrScanStartIdleScan(mac_ctx);
+}
+>>>>>>> 6896de6... prima updates

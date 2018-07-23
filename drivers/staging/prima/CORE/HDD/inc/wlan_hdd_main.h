@@ -2226,4 +2226,115 @@ hdd_capture_tsf(hdd_adapter_t *adapter, uint32_t *buf, int len)
 }
 #endif
 int hdd_dhcp_mdns_offload(hdd_adapter_t *adapter);
+<<<<<<< HEAD
+=======
+
+/**
+ * wlan_hdd_stop_mon() - stop monitor mode
+ * @hdd_ctx: pointer to hdd context
+ * @wait: used to wait for completion event from firmware
+ *
+ * Return: 0 - success, negative value -failure
+ */
+int wlan_hdd_stop_mon(hdd_context_t *hdd_ctx, bool wait);
+
+/**
+ * wlan_hdd_check_monitor_state() - check monitor state
+ * @hdd_ctx: pointer to hdd context
+ *
+ * This function is used to check whether capture of monitor mode is ON/OFF
+ *
+ * Return: true - capture is ON, false - capture is OFF
+ */
+bool wlan_hdd_check_monitor_state(hdd_context_t *hdd_ctx);
+
+/**
+ * hdd_disable_roaming() - disable sme roaming
+ * @hdd_ctx: pointer to hdd context
+ *
+ * This function is used to disable FT roaming, one of the use-case
+ * is to disable when monitor mode starts
+ *
+ * Return: None
+ */
+void hdd_disable_roaming(hdd_context_t *hdd_ctx);
+
+/**
+ * hdd_disable_roaming() - enable sme roaming
+ * @hdd_ctx: pointer to hdd context
+ *
+ * This function is used to enable FT roaming, if roaming is enabled before
+ * invocation of hdd_disable_roaming(), one of the use-case is to re-enable
+ * roaming when monitor mode stops
+ *
+ * Return: None
+ */
+void hdd_restore_roaming(hdd_context_t *hdd_ctx);
+
+int wlan_hdd_check_and_stop_mon(hdd_adapter_t *sta_adapter, bool wait);
+
+/**
+ * hdd_wait_for_ecsa_complete() - wait if ecsa is in progress
+ * @hdd_ctx: hdd context
+ *
+ * Return: int.
+ */
+int hdd_wait_for_ecsa_complete(hdd_context_t *hdd_ctx);
+
+/**
+ * hdd_is_sta_sap_scc_allowed_on_dfs_chan() - check if sta+sap scc allowed on
+ * dfs chan
+ * @hdd_ctx: pointer to hdd context
+ *
+ * This function used to check if sta+sap scc allowed on DFS channel.
+ *
+ * Return: None
+ */
+bool hdd_is_sta_sap_scc_allowed_on_dfs_chan(hdd_context_t *hdd_ctx);
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 7, 0))
+static inline int
+hdd_wlan_nla_put_u64(struct sk_buff *skb, int attrtype, u64 value)
+{
+	return nla_put_u64(skb, attrtype, value);
+}
+#else
+static inline int
+hdd_wlan_nla_put_u64(struct sk_buff *skb, int attrtype, u64 value)
+{
+	return nla_put_u64_64bit(skb, attrtype, value, NL80211_ATTR_PAD);
+}
+#endif
+
+/*
+ * hdd_parse_disable_chn_cmd() - Parse the channel list received
+ * in command.
+ * @adapter: pointer to hdd adapter
+ *
+ * @return: 0 on success, Error code on failure
+ */
+int hdd_parse_disable_chan_cmd(hdd_adapter_t *adapter, tANI_U8 *ptr);
+
+/*
+ * hdd_parse_disable_chn_cmd() - get disable channel list
+ * in command.
+ * @hdd_ctx: hdd context
+ * @buf: buffer to hold disable channel list
+ * @buf_len: buffer length
+ *
+ * @return: length of data copied to buf
+ */
+int hdd_get_disable_ch_list(hdd_context_t *hdd_ctx, tANI_U8 *buf,
+                            tANI_U8 buf_len);
+
+/**
+ * hdd_is_cli_iface_up() - check if there is any cli iface up
+ * @hdd_ctx: HDD context
+ *
+ * Return: return true if there is any cli iface(STA/P2P_CLI) is up
+ *         else return false
+ */
+bool hdd_is_cli_iface_up(hdd_context_t *hdd_ctx);
+
+>>>>>>> 6896de6... prima updates
 #endif    // end #if !defined( WLAN_HDD_MAIN_H )

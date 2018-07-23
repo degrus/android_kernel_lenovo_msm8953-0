@@ -6123,6 +6123,114 @@ static void WLANTL_CacheEapol(WLANTL_CbType* pTLCb, vos_pkt_t* vosTempBuff)
    }
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * WLANTL_SampleRxRSSI() - Collect RX rssi samples
+ * @pTLCb: TL context pointer
+ * @pBDHeader: RX Meta data pointer
+ * @sta_id: Station ID
+ *
+ * This function records the last twenty RX RSSI samples
+ *
+ * Return: void
+ */
+static void WLANTL_SampleRxRSSI(WLANTL_CbType* pTLCb, void * pBDHeader,
+                                uint8_t sta_id)
+{
+   WLANTL_STAClientType *pClientSTA = pTLCb->atlSTAClients[sta_id];
+   uint8_t count = pClientSTA->rssi_sample_cnt;
+   uint8_t old_idx = pClientSTA->rssi_stale_idx;
+   s8 curr_RSSI, curr_RSSI0, curr_RSSI1;
+
+   curr_RSSI0 = WLANTL_GETRSSI0(pBDHeader);
+   curr_RSSI1 = WLANTL_GETRSSI1(pBDHeader);
+
+   curr_RSSI  = (curr_RSSI0 > curr_RSSI1) ? curr_RSSI0 : curr_RSSI1;
+
+   if (count >= WLANTL_RSSI_SAMPLE_CNT) {
+      pClientSTA->rssi_sample_sum -= pClientSTA->rssi_sample[old_idx];
+      pClientSTA->rssi_sample[old_idx] = curr_RSSI;
+      pClientSTA->rssi_sample_sum += pClientSTA->rssi_sample[old_idx];
+      old_idx >= (WLANTL_RSSI_SAMPLE_CNT - 1) ? old_idx = 0 : old_idx++;
+      pClientSTA->rssi_stale_idx = old_idx;
+   } else {
+      pClientSTA->rssi_sample[count] = curr_RSSI;
+      pClientSTA->rssi_sample_sum += pClientSTA->rssi_sample[count];
+      pClientSTA->rssi_sample_cnt++;
+   }
+}
+
+/**
+ * WLANTL_StaMonRX - Send packets to monitor mode
+ * @pTLCb: TL context pointer
+ * @pFrame: Rx buffer pointer
+ * @pBDHeader: RX Meta data pointer
+ * @sta_id: Station ID
+ *
+ * Return: true if RX monitor mode or false otherwise
+ */
+static bool WLANTL_StaMonRX(WLANTL_CbType* pTLCb, vos_pkt_t *pFrame,
+                            WDI_DS_RxMetaInfoType *pRxMetadata,
+                            uint8_t sta_id)
+{
+   WLANTL_STAClientType *pClientSTA = NULL;
+   tpSirMacMgmtHdr pHdr = NULL;
+   v_MACADDR_t *peerMacAddr = NULL;
+   uint8_t i = 0;
+   uint8_t addr1_index = WDA_GET_RX_ADDR1_IDX(pRxMetadata);
+   bool tp_data = false;
+
+   pHdr = (tpSirMacMgmtHdr)pRxMetadata->mpduHeaderPtr;
+   peerMacAddr = (v_MACADDR_t *)pHdr->da;
+
+   if (vos_check_monitor_state() == false)
+       return false;
+
+   if ((addr1_index == 254) &&
+       WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(pRxMetadata)) &&
+       !pRxMetadata->bcast) {
+       tp_data = true;
+   } else if (WLANTL_STA_ID_MONIFACE(sta_id) == 0) {
+       return false;
+   }
+
+   if (WLANTL_IS_MGMT_FRAME(WDA_GET_RX_TYPE_SUBTYPE(pRxMetadata)) || tp_data) {
+
+      if (pRxMetadata->bcast)
+         return false;
+
+      for (i = 0; i < WLAN_MAX_STA_COUNT; i++) {
+         if (NULL == pTLCb->atlSTAClients[i])
+            continue;
+         if (0 == pTLCb->atlSTAClients[i]->ucExists)
+            continue;
+         if (WLANTL_STA_AUTHENTICATED == pTLCb->atlSTAClients[i]->tlState)
+            break;
+      }
+
+      if (i == WLAN_MAX_STA_COUNT) {
+          if (tp_data)
+              return true;
+
+         return false;
+      }
+
+      pClientSTA = pTLCb->atlSTAClients[i];
+
+      if (vos_is_macaddr_equal(peerMacAddr,
+          &pClientSTA->wSTADesc.vSelfMACAddress))
+         return false;
+
+      if (vos_is_macaddr_equal(peerMacAddr, &pTLCb->spoofMacAddr.spoofMac) &&
+          !tp_data)
+          return false;
+   }
+
+   return true;
+}
+
+>>>>>>> 6896de6... prima updates
 /*==========================================================================
 
   FUNCTION    WLANTL_RxFrames

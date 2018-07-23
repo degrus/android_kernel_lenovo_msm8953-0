@@ -54,7 +54,7 @@
 #endif /* DHCP_SERVER_OFFLOAD */
 
 //Number of items that can be configured
-#define MAX_CFG_INI_ITEMS   512
+#define MAX_CFG_INI_ITEMS   1024
 
 #ifdef SAP_AUTH_OFFLOAD
 /* 802.11 pre-share key length */
@@ -3093,6 +3093,54 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
 #define CFG_TRIGGER_NULLFRAME_BEFORE_HB_MAX        (1)
 #define CFG_TRIGGER_NULLFRAME_BEFORE_HB_DEFAULT    (0)
 
+<<<<<<< HEAD
+=======
+/*
+ * If enabled ecsa will be used to switch channel to force scc else SAP
+ * will be restarted.
+ */
+#define CFG_FORCE_SCC_WITH_ECSA_NAME       "force_scc_with_ecsa"
+#define CFG_FORCE_SCC_WITH_ECSA_MIN        (0)
+#define CFG_FORCE_SCC_WITH_ECSA_MAX        (1)
+#define CFG_FORCE_SCC_WITH_ECSA_DEFAULT    (1)
+
+#define CFG_STA_SAP_SCC_ON_DFS_CHAN             "sta_sap_scc_on_dfs_chan"
+#define CFG_STA_SAP_SCC_ON_DFS_CHAN_MIN         (0)
+#define CFG_STA_SAP_SCC_ON_DFS_CHAN_MAX         (1)
+#define CFG_STA_SAP_SCC_ON_DFS_CHAN_DEFAULT     (0)
+
+/*
+ * gEnableAggBTCScoOUI is used to enable aggregation during SCO
+ * with specific AP based on OUI. If set to nothing, feature is
+ * enabled for all APs. Ini supports only single OUI.
+ * ex: gEnableAggBTCScoOUI=74-EA-CB - enable with specific AP
+ */
+#define CFG_ENABLE_AGG_BTC_SCO_OUI_NAME       "gEnableAggBTCScoOUI"
+#define CFG_ENABLE_AGG_BTC_SCO_OUI_DEFAULT    ""
+
+/*
+ * gNumBuffBTCSco is used to set block ack buffer size for
+ * aggregation during SCO. If this is set to 0 or 1, aggregation
+ * during SCO feature is disabled. To enable aggregation
+ * during SCO, gNumBuffBTCSco should be set to be greater than 1.
+ */
+#define CFG_NUM_BUFF_BTC_SCO_INVALID     1
+
+#define CFG_NUM_BUFF_BTC_SCO_NAME       "gNumBuffBTCSco"
+#define CFG_NUM_BUFF_BTC_SCO_MIN        (0)
+#define CFG_NUM_BUFF_BTC_SCO_MAX        (10)
+#define CFG_NUM_BUFF_BTC_SCO_DEFAULT    (0)
+
+
+/* Value for ENABLE_POWERSAVE_OFFLOAD*/
+#define CFG_ENABLE_POWERSAVE_OFFLOAD_NAME       "gEnablePowerSaveOffload"
+#define CFG_ENABLE_POWERSAVE_OFFLOAD_MIN        (1)
+#define CFG_ENABLE_POWERSAVE_OFFLOAD_MAX        (2)
+#define CFG_ENABLE_POWERSAVE_OFFLOAD_DEFAULT    (1)
+
+
+
+>>>>>>> 6896de6... prima updates
 /*--------------------------------------------------------------------------- 
   Type declarations
   -------------------------------------------------------------------------*/ 

@@ -423,6 +423,7 @@ wlan_hdd_iface_limit[] = {
 
 /* By default, only single channel concurrency is allowed */
 static struct ieee80211_iface_combination
+<<<<<<< HEAD
 wlan_hdd_iface_combination = {
         .limits = wlan_hdd_iface_limit,
         .num_different_channels = 1,
@@ -439,6 +440,43 @@ wlan_hdd_iface_combination = {
         .max_interfaces = WLAN_MAX_INTERFACES,
         .n_limits = ARRAY_SIZE(wlan_hdd_iface_limit),
         .beacon_int_infra_match = false,
+=======
+wlan_hdd_iface_combination[] = {
+	{
+		.limits = wlan_hdd_iface_limit,
+		.num_different_channels = 1,
+		/*
+		 * max = WLAN_MAX_INTERFACES ; JellyBean architecture creates wlan0
+		 * and p2p0 interfaces during driver init
+		 * Some vendors create separate interface for P2P operations.
+		 * wlan0: STA interface
+		 * p2p0: P2P Device interface, action frames goes
+		 * through this interface.
+		 * p2p-xx: P2P interface, After GO negotiation this interface is
+		 * created for p2p operations(GO/CLIENT interface).
+		 */
+		.max_interfaces = WLAN_MAX_INTERFACES,
+		.n_limits = ARRAY_SIZE(wlan_hdd_iface_limit),
+		.beacon_int_infra_match = false,
+	},
+	{
+		.limits = wlan_hdd_iface_sta_mon_limit,
+		.num_different_channels = 1,
+		.max_interfaces = WLAN_STA_AND_MON_INTERFACES,
+		.n_limits = ARRAY_SIZE(wlan_hdd_iface_sta_mon_limit),
+		.beacon_int_infra_match = false,
+	}
+};
+#endif
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)) || defined(WITH_BACKPORTS)
+static const struct wiphy_wowlan_support wowlan_support_cfg80211_init = {
+    .flags = WIPHY_WOWLAN_ANY |
+             WIPHY_WOWLAN_MAGIC_PKT,
+    .n_patterns = WOWL_MAX_PTRNS_ALLOWED,
+    .pattern_min_len = 1,
+    .pattern_max_len = WOWL_PTRN_MAX_SIZE,
+>>>>>>> 6896de6... prima updates
 };
 #endif
 
@@ -8479,6 +8517,18 @@ int wlan_hdd_cfg80211_init(struct device *dev,
     wiphy->flags |=   WIPHY_FLAG_DISABLE_BEACON_HINTS;
 #endif
 
+<<<<<<< HEAD
+=======
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)) || defined(WITH_BACKPORTS)
+    wiphy->wowlan = &wowlan_support_cfg80211_init;
+#else
+    wiphy->wowlan.flags = WIPHY_WOWLAN_ANY |
+                          WIPHY_WOWLAN_MAGIC_PKT;
+    wiphy->wowlan.n_patterns = WOWL_MAX_PTRNS_ALLOWED;
+    wiphy->wowlan.pattern_min_len = 1;
+    wiphy->wowlan.pattern_max_len = WOWL_PTRN_MAX_SIZE;
+#endif
+>>>>>>> 6896de6... prima updates
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0))
     wiphy->flags |= WIPHY_FLAG_HAVE_AP_SME

@@ -11338,7 +11338,6 @@ eHalStatus csrRoamLostLink( tpAniSirGlobal pMac, tANI_U32 sessionId, tANI_U32 ty
     eCsrRoamResult result = eCSR_ROAM_RESULT_LOSTLINK;
     tCsrRoamInfo *pRoamInfo = NULL;
     tCsrRoamInfo roamInfo;
-    tANI_BOOLEAN fToRoam;
     tCsrRoamSession *pSession = CSR_GET_SESSION( pMac, sessionId );
     /* To silence the KW tool Null chaeck is added */
     if(!pSession)
@@ -11346,8 +11345,6 @@ eHalStatus csrRoamLostLink( tpAniSirGlobal pMac, tANI_U32 sessionId, tANI_U32 ty
         smsLog(pMac, LOGE, FL("  session %d not found "), sessionId);
         return eHAL_STATUS_FAILURE;
     }
-    //Only need to roam for infra station. In this case P2P client will roam as well
-    fToRoam = CSR_IS_INFRASTRUCTURE(&pSession->connectedProfile);
     pSession->fCancelRoaming = eANI_BOOLEAN_FALSE;
     if ( eWNI_SME_DISASSOC_IND == type )
     {
@@ -11384,6 +11381,7 @@ eHalStatus csrRoamLostLink( tpAniSirGlobal pMac, tANI_U32 sessionId, tANI_U32 ty
     {
         status = csrSendMBDeauthCnfMsg(pMac, pDeauthIndMsg);
     }
+<<<<<<< HEAD
     if(!HAL_STATUS_SUCCESS(status))
     {
         //If fail to send confirmation to PE, not to trigger roaming
@@ -11464,6 +11462,9 @@ eHalStatus csrRoamLostLink( tpAniSirGlobal pMac, tANI_U32 sessionId, tANI_U32 ty
         }
     }
     
+=======
+
+>>>>>>> 6896de6... prima updates
     return (status);
 }
 
